@@ -11,7 +11,7 @@ namespace CodeFirst.DataAccess.Factories
         {
             var optionsBuilder = new DbContextOptionsBuilder<PostgresDbContext>();
             var connectionString = Environment.GetEnvironmentVariable("POSTGRES_MOVIES_LOCAL_CONNSTR");
-            optionsBuilder.UseNpgsql(connectionString
+            optionsBuilder.UseOracle(connectionString
                                      ?? throw new NullReferenceException(
                                          $"Connection string is not got from environment {nameof(connectionString)}"));
 
