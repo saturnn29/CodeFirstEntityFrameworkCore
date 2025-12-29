@@ -26,7 +26,7 @@ pipeline {
         stage('Test Run') {
             steps {
                 withCredentials([string(credentialsId: 'oracle-connection-string', variable: 'SECURE_ORA_CONN')]) {
-                    sh 'docker run --rm -e POSTGRES_MOVIES_LOCAL_CONNSTR="${SECURE_ORA_CONN}" ${DOCKER_USER}/${IMAGE_NAME}:latest || true'
+                    sh 'docker run --rm -e POSTGRES_MOVIES_LOCAL_CONNSTR="$SECURE_ORA_CONN" ${DOCKER_USER}/${IMAGE_NAME}:latest || true'
                 }
             }
         }
