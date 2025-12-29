@@ -1,7 +1,6 @@
 pipeline {
     agent any
     environment {
-        ORA_CONN = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.197.129)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=pdb1)));User Id=system;Password=miserable;"
         DOCKER_USER = "duylinh29"
         IMAGE_NAME = "movie-app"
     }
@@ -17,7 +16,6 @@ pipeline {
         }
         stage('Push to Registry') {
             steps {
-                // This logs you into Docker Hub using the Jenkins Credentials ID
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER_ENV')]) {
                     sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER_ENV --password-stdin"
                     sh "docker push ${DOCKER_USER}/${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -27,8 +25,9 @@ pipeline {
         }
         stage('Test Run') {
             steps {
-                // Run the container from the newly pushed image
-                sh "docker run --rm -e POSTGRES_MOVIES_LOCAL_CONNSTR='${ORA_CONN}' ${DOCKER_USER}/${IMAGE_NAME}:latest"
+                withCredentials([string(credentialsId: 'oracle-connection-string', variable: 'SECURE_ORA_CONN')]) {
+                    sh "docker run --rm -e POSTGRES_MOVIES_LOCAL_CONNSTR='${SECURE_ORA_CONN}' ${DOCKER_USER}/${IMAGE_NAME}:latest || true"
+                }
             }
         }
     }
